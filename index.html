@@ -3,63 +3,226 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>차원 대균열 런처</title>
-<meta name="description" content="차원 대균열 마인크래프트 서버 전용 런처 — 마이크로소프트 로그인, 자바·모드 자동 설치, 원클릭 접속">
+<title>차원 대균열</title>
+<meta name="description" content="차원 대균열 — 애니 캐릭터 꼬리잡기 마인크래프트 서버 · 전용 런처 · 캐릭터 도감">
 <link rel="icon" href="logo.png">
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <style>
-  :root { --gold:#E8C27A; --gold-hi:#FFF1C8; --ink:#0B0816; --panel:rgba(12,9,24,.78); --line:rgba(232,194,122,.35); --text:#EDE7F6; --mute:#A79FBF; }
+  /* ── 규칙집 (런처 · 게임 UI 와 공통) : 칠흑 남보라 바탕 · 금(주) · 균열 보라/청록(보조) · 금 코너 브래킷 · 200ms ease-out ── */
+  :root { --ink:#08060F; --panel:rgba(14,10,28,.82); --panel2:rgba(24,16,46,.9); --line:rgba(232,194,122,.28); --gold:#E8C27A; --gold-hi:#FFF1C8;
+          --rift:#B07CFF; --rift2:#5CF2FF; --text:#EDE7F6; --mute:#9C94B6; --ease:cubic-bezier(.2,.8,.2,1); }
   * { box-sizing:border-box; }
-  body { margin:0; background:var(--ink) url(bg.jpg) center/cover fixed; color:var(--text); font-family:"Pretendard","Malgun Gothic",sans-serif; line-height:1.7; }
-  .wrap { max-width:880px; margin:0 auto; padding:56px 16px 40px; }
-  header { text-align:center; }
-  header img { width:120px; filter:drop-shadow(0 0 24px rgba(176,124,255,.6)); }
-  h1 { font-size:34px; letter-spacing:8px; margin:12px 0 4px; color:var(--gold-hi); }
-  .sub { color:var(--mute); margin:0 0 32px; }
-  .card { position:relative; background:var(--panel); border:1px solid var(--line); padding:24px 26px; margin:18px 0; backdrop-filter:blur(6px); }
-  .card::before,.card::after { content:""; position:absolute; width:18px; height:18px; }
+  html { scroll-behavior:smooth; }
+  body { margin:0; background:var(--ink); color:var(--text); font-family:"Pretendard Variable",Pretendard,"Malgun Gothic",sans-serif; overflow-x:hidden; }
+  a { color:var(--gold); text-decoration:none; }
+  .en { font-size:11px; letter-spacing:.42em; color:var(--gold); text-transform:uppercase; opacity:.85; }
+
+  /* 상단 내비 (떠 있는 막대) */
+  nav { position:fixed; inset:0 0 auto 0; z-index:20; display:flex; align-items:center; gap:28px; padding:14px 28px;
+        background:linear-gradient(rgba(8,6,15,.9),rgba(8,6,15,0)); }
+  nav img { width:34px; }
+  nav .brand { font-weight:800; letter-spacing:.3em; color:var(--gold-hi); }
+  nav .links { margin-left:auto; display:flex; gap:22px; font-size:14px; }
+  nav .links a { color:var(--text); opacity:.75; transition:opacity .2s var(--ease); }
+  nav .links a:hover { opacity:1; color:var(--gold-hi); }
+
+  /* 히어로 : 가운데는 주인공만 */
+  .hero { position:relative; height:100vh; min-height:560px; display:grid; place-items:center; text-align:center;
+          background:url(bg.jpg) center/cover; }
+  .hero::after { content:""; position:absolute; inset:0; background:radial-gradient(ellipse at 50% 40%,rgba(8,6,15,0) 30%,rgba(8,6,15,.85) 85%),
+                 linear-gradient(transparent 60%,var(--ink)); }
+  .hero .in { position:relative; z-index:1; padding:0 16px; animation:rise .9s var(--ease) both; }
+  .hero img { width:132px; filter:drop-shadow(0 0 30px rgba(176,124,255,.7)); }
+  .hero h1 { margin:14px 0 6px; font-size:clamp(40px,7vw,78px); letter-spacing:.32em; font-weight:900;
+             background:linear-gradient(#FFF6DC,#E8C27A 55%,#9A7432); -webkit-background-clip:text; color:transparent; }
+  .hero p { color:var(--mute); margin:0 0 30px; }
+  .btn { display:inline-block; padding:15px 46px; color:#1B1206; font-weight:800; letter-spacing:.4em;
+         background:linear-gradient(#FFF1C8,#E8C27A 45%,#B88A3E); clip-path:polygon(14px 0,100% 0,100% calc(100% - 14px),calc(100% - 14px) 100%,0 100%,0 14px);
+         transition:filter .2s var(--ease), transform .2s var(--ease); }
+  .btn:hover { filter:brightness(1.1) drop-shadow(0 0 18px rgba(255,214,140,.6)); transform:translateY(-1px); }
+  .btn.ghost { background:none; color:var(--gold-hi); outline:1px solid var(--gold); clip-path:none; margin-left:10px; }
+  @keyframes rise { from { opacity:0; transform:translateY(18px); } }
+
+  section { max-width:1240px; margin:0 auto; padding:90px 16px 40px; }
+  h2 { margin:6px 0 26px; font-size:32px; letter-spacing:.12em; }
+
+  /* 패널 + 금 코너 브래킷 */
+  .card { position:relative; background:var(--panel); border:1px solid var(--line); backdrop-filter:blur(8px); }
+  .card::before,.card::after { content:""; position:absolute; width:16px; height:16px; pointer-events:none; }
   .card::before { top:-2px; left:-2px; border-top:2px solid var(--gold); border-left:2px solid var(--gold); }
   .card::after { bottom:-2px; right:-2px; border-bottom:2px solid var(--gold); border-right:2px solid var(--gold); }
-  h2 { margin:0 0 10px; font-size:19px; color:var(--gold); letter-spacing:2px; }
-  ul { margin:0; padding-left:20px; }
-  .btn { display:inline-block; padding:12px 30px; margin-top:6px; color:#1B1206; font-weight:800; letter-spacing:4px; text-decoration:none;
-         background:linear-gradient(#FFF1C8,#E8C27A 45%,#B88A3E); clip-path:polygon(12px 0,100% 0,100% calc(100% - 12px),calc(100% - 12px) 100%,0 100%,0 12px); }
-  footer { text-align:center; color:var(--mute); font-size:13px; margin-top:28px; }
-  a { color:var(--gold); }
+
+  .feat { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:18px; }
+  .feat .card { padding:22px; }
+  .feat b { color:var(--gold-hi); display:block; margin-bottom:6px; }
+  .feat span { color:var(--mute); font-size:14px; line-height:1.7; }
+
+  /* 도감 : 작품 탭 → 카드 그리드 (전부 어둡게 · 호버 한 장만 밝게) → 상세 패널 */
+  .tabs { display:flex; gap:8px; overflow-x:auto; padding-bottom:10px; scrollbar-width:thin; }
+  .tab { flex:none; padding:9px 16px; border:1px solid var(--line); background:rgba(14,10,28,.6); color:var(--mute); cursor:pointer;
+         font:inherit; font-size:14px; transition:all .2s var(--ease); }
+  .tab:hover { color:var(--text); }
+  .tab.on { color:#1B1206; background:var(--gold); border-color:var(--gold); font-weight:700; }
+  .search { margin:14px 0 18px; width:100%; max-width:360px; padding:10px 14px; background:rgba(14,10,28,.7); border:1px solid var(--line); color:var(--text); font:inherit; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:12px; }
+  .grid:hover .ch { filter:brightness(.55) saturate(.7); }
+  .ch { position:relative; aspect-ratio:3/4; cursor:pointer; overflow:hidden; border:1px solid rgba(255,255,255,.06);
+        background:linear-gradient(160deg,var(--c,#5a3a9a) -40%,#0E0A1C 70%); transition:filter .2s var(--ease), transform .2s var(--ease), border-color .2s; }
+  .grid .ch:hover { filter:none; transform:translateY(-3px); border-color:var(--gold); }
+  /* 문장(엠블럼) : 금테 마름모 + 이름 첫 글자 + 작품색 균열빛 — 원작 그림 대신 사이트가 직접 그림 */
+  .emb { position:absolute; left:50%; top:40%; width:58%; aspect-ratio:1; transform:translate(-50%,-50%) rotate(45deg);
+         border:2px solid var(--gold); background:radial-gradient(circle at 50% 50%, color-mix(in srgb,var(--c,#5a3a9a) 85%,#fff 15%) 0%, #120C22 70%);
+         box-shadow:0 0 0 4px rgba(8,6,15,.8), 0 0 0 5px rgba(232,194,122,.35), 0 0 28px color-mix(in srgb,var(--c,#5a3a9a) 70%,transparent); }
+  .emb::before { content:""; position:absolute; inset:18%; border:1px solid rgba(255,241,200,.35); }
+  .emb span { position:absolute; inset:0; display:grid; place-items:center; transform:rotate(-45deg); font-size:clamp(26px,3.4vw,40px); font-weight:900;
+              color:var(--gold-hi); text-shadow:0 0 14px rgba(255,214,140,.55), 0 2px 0 rgba(0,0,0,.6); }
+  .dh .emb { position:relative; left:auto; top:auto; flex:none; width:70px; margin:14px; transform:rotate(45deg); }
+  .dh .emb span { font-size:30px; }
+  .ch .nm { position:absolute; left:0; right:0; bottom:0; padding:10px; background:linear-gradient(transparent,rgba(8,6,15,.95)); }
+  .ch .nm b { display:block; font-size:15px; }
+  .ch .nm i { font-style:normal; font-size:11px; color:var(--mute); }
+
+  /* 상세 패널 (오른쪽에서 밀려 나옴) */
+  .shade { position:fixed; inset:0; z-index:30; background:rgba(4,3,8,.6); backdrop-filter:blur(4px); opacity:0; pointer-events:none; transition:opacity .25s var(--ease); }
+  .shade.on { opacity:1; pointer-events:auto; }
+  .detail { position:fixed; z-index:31; top:0; right:0; height:100%; width:min(560px,100%); overflow-y:auto; padding:34px 28px 50px;
+            background:linear-gradient(180deg,var(--panel2),rgba(8,6,15,.97)); border-left:1px solid var(--line);
+            transform:translateX(100%); transition:transform .3s var(--ease); }
+  .detail.on { transform:none; }
+  .detail .x { position:absolute; top:16px; right:18px; background:none; border:none; color:var(--mute); font-size:26px; cursor:pointer; }
+  .dh { display:flex; gap:18px; align-items:center; margin-bottom:18px; }
+  .dh img { width:84px; height:84px; image-rendering:pixelated; background:radial-gradient(var(--c,#5a3a9a),transparent 70%); padding:8px; }
+  .dh h3 { margin:4px 0 2px; font-size:28px; }
+  .tagline { color:var(--mute); font-size:14px; line-height:1.7; margin-bottom:16px; }
+  .box { padding:16px 18px; margin:12px 0; }
+  .box h4 { margin:0 0 8px; font-size:13px; letter-spacing:.3em; color:var(--gold); }
+  .box p { margin:0; font-size:14px; line-height:1.8; }
+  .sk { display:grid; grid-template-columns:auto 1fr; gap:6px 12px; padding:12px 0; border-top:1px solid rgba(255,255,255,.06); }
+  .sk:first-of-type { border-top:none; }
+  .key { grid-row:span 2; align-self:start; min-width:62px; text-align:center; padding:5px 6px; font-size:11px; font-weight:700; color:var(--gold-hi);
+         border:1px solid var(--gold); background:rgba(232,194,122,.08); }
+  .sk b { font-size:15px; }
+  .sk p { grid-column:2; margin:0; font-size:13px; line-height:1.75; color:#D7D0E8; }
+
+  footer { text-align:center; color:var(--mute); font-size:13px; padding:50px 16px 60px; line-height:1.9; }
+  @media (max-width:640px) { nav .links { gap:12px; font-size:13px; } nav .brand { display:none; } .btn.ghost { margin:10px 0 0; } }
+  .pv .hero { height:420px; min-height:0; }
+  @media (prefers-reduced-motion:reduce) { * { animation:none !important; transition:none !important; } }
 </style>
 </head>
 <body>
-<div class="wrap">
-  <header>
-    <img src="logo.png" alt="차원 대균열 로고">
+<nav>
+  <img src="logo.png" alt="">
+  <span class="brand">차원 대균열</span>
+  <div class="links"><a href="#about">소개</a><a href="#codex">캐릭터 도감</a><a href="#download">런처</a><a href="privacy.html">개인정보</a></div>
+</nav>
+
+<header class="hero">
+  <div class="in">
+    <img src="logo.png" alt="차원 대균열 엠블럼">
+    <div class="en">Dimension Rift</div>
     <h1>차원 대균열</h1>
-    <p class="sub">애니 캐릭터 꼬리잡기 · 마인크래프트 Fabric 모드 서버 전용 런처</p>
-  </header>
-
-  <section class="card">
-    <h2>런처가 하는 일</h2>
-    <ul>
-      <li>마이크로소프트 계정으로 마인크래프트 로그인 (정품 계정 필요)</li>
-      <li>자바 · 마인크래프트 1.21.11 · Fabric · 서버 전용 모드를 자동으로 설치하고 최신 상태로 유지</li>
-      <li>파일 무결성 검사 후 게임 실행 · 서버 자동 접속</li>
-    </ul>
-  </section>
-
-  <section class="card">
-    <h2>내려받기</h2>
-    <p>최신 런처는 이 저장소의 Releases 에서 받을 수 있습니다.</p>
+    <p>차원의 벽이 갈라졌다. 저마다의 세계에서 끌려온 영웅들이 하나의 전장에 모인다.</p>
     <a class="btn" href="https://github.com/ekrznf/ekrznf.github.io/releases/latest">런처 받기</a>
-  </section>
+    <a class="btn ghost" href="#codex">캐릭터 도감</a>
+  </div>
+</header>
 
-  <section class="card">
-    <h2>개인정보</h2>
-    <p>런처는 마인크래프트 로그인에 필요한 정보만 사용하며, 운영자 서버로 계정 정보를 보내지 않습니다. 자세한 내용은
-      <a href="privacy.html">개인정보 처리방침</a>을 확인해 주세요.</p>
-  </section>
+<section id="about">
+  <div class="en">About</div>
+  <h2>균열 너머의 전장</h2>
+  <div class="feat">
+    <div class="card"><b>꼬리를 빼앗아라</b><span>작품을 넘나드는 캐릭터들이 한 판에 모여 꼬리를 빼앗고 지키며 끝까지 살아남는 마인크래프트 서버입니다.</span></div>
+    <div class="card"><b>캐릭터마다 고유한 기술</b><span>패시브 · 스킬 6종 · 궁극기 · 조건을 채우면 열리는 스페셜 궁극기까지, 모든 캐릭터가 손맛이 다릅니다.</span></div>
+    <div class="card"><b>런처 하나로 끝</b><span>마이크로소프트 로그인 후 자바 · 마인크래프트 · Fabric · 모드 설치와 업데이트를 런처가 알아서 맞춥니다.</span></div>
+  </div>
+</section>
 
-  <footer>
-    제작 : 닥쿨 · 공동제작 : 연어 · 도움 : 윤곽<br>
-    이 런처는 Helios Launcher (MIT, © Daniel D. Scalzi) 를 바탕으로 만들었습니다. Mojang · Microsoft 와 관련이 없는 비공식 프로그램입니다.
-  </footer>
-</div>
+<section id="codex">
+  <div class="en">Character Codex</div>
+  <h2>캐릭터 도감</h2>
+  <div class="tabs" id="tabs"></div>
+  <input class="search" id="q" placeholder="이름으로 찾기">
+  <div class="grid" id="grid"></div>
+</section>
+
+<section id="download">
+  <div class="en">Launcher</div>
+  <h2>런처 받기</h2>
+  <div class="card box"><p>Windows 10/11 · 설치판과 포터블 두 가지. 정품 마인크래프트(마이크로소프트 계정)가 필요합니다.</p>
+    <p style="margin-top:14px"><a class="btn" href="https://github.com/ekrznf/ekrznf.github.io/releases/latest">최신 버전 받기</a></p></div>
+</section>
+
+<div class="shade" id="shade"></div>
+<aside class="detail" id="detail" aria-hidden="true"></aside>
+
+<footer>
+  공동제작 : 닥쿨, 민수, 우빈, 연어 · 도움 : 윤곽<br>
+  팬 메이드 비공식 서버입니다. 각 캐릭터와 작품의 권리는 원저작자에게 있으며, 이 사이트는 원작 그림을 사용하지 않습니다.<br>
+  런처는 Helios Launcher (MIT, © Daniel D. Scalzi) 기반 · Mojang · Microsoft 와 관련 없음 · <a href="privacy.html">개인정보 처리방침</a>
+</footer>
+
+<script>
+if (location.search.includes('preview')) document.documentElement.classList.add('pv');   // 화면 확인용 (히어로 낮게)
+// 마인크래프트 색 코드(&0~&f · &l · &o · &r) → 웹 색 (게임 안에서 보던 강조 그대로)
+const MC = {0:'#000',1:'#3a4fd8',2:'#3fbf3f',3:'#3fbfbf',4:'#d04040',5:'#b45ad6',6:'#e8c27a',7:'#b9b3c9',8:'#7c7690',9:'#7f8cff',a:'#7cf07c',b:'#7ff0f0',c:'#ff7070',d:'#ff8ff4',e:'#ffe57a',f:'#ffffff'};
+const esc = s => s.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function mc(s) {
+  let out = '', color = null, bold = false, buf = '';
+  const flush = () => { if (!buf) return; let t = esc(buf); if (bold) t = '<b>' + t + '</b>'; out += color ? `<span style="color:${color}">${t}</span>` : t; buf = ''; };
+  for (let i = 0; i < s.length; i++) {
+    if (s[i] === '&' && i + 1 < s.length && /[0-9a-flor]/i.test(s[i + 1])) {
+      flush(); const k = s[++i].toLowerCase();
+      if (k === 'l') bold = true; else if (k === 'r') { color = null; bold = false; } else if (k === 'o') {} else { color = MC[k]; bold = false; }
+    } else buf += s[i];
+  }
+  flush(); return out;
+}
+const plain = s => s.replace(/&[0-9a-flor]/gi, '');
+const KEYS = ['좌클릭', '우클릭', '쉬프트+좌', '쉬프트+우', 'F', '쉬프트+F'];
+let G, cat = 'all';
+
+fetch('data/guide.json').then(r => r.json()).then(g => {
+  G = g;
+  const tabs = document.getElementById('tabs');
+  const mk = (id, name) => { const b = document.createElement('button'); b.className = 'tab' + (id === cat ? ' on' : ''); b.textContent = name; b.onclick = () => { cat = id; [...tabs.children].forEach(x => x.classList.toggle('on', x === b)); draw(); }; tabs.appendChild(b); };
+  mk('all', '전체 ' + g.jobs.length);
+  g.categories.forEach(c => mk(c.id, plain(c.name)));
+  document.getElementById('q').oninput = draw;
+  draw();
+  if (location.hash === '#codex') document.getElementById('codex').scrollIntoView();
+  if (location.hash.startsWith('#c-')) openChar(location.hash.slice(3));
+}).catch(() => { document.getElementById('grid').innerHTML = '<p style="color:var(--mute)">도감을 불러오지 못했어요.</p>'; });
+
+function catOf(id) { return G.categories.find(c => c.id === id) || {}; }
+function draw() {
+  const q = document.getElementById('q').value.trim();
+  const list = G.jobs.filter(j => (cat === 'all' || j.category === cat) && (!q || plain(j.name).includes(q)))
+    .sort((a, b) => (catOf(a.category).slot - catOf(b.category).slot) || a.order - b.order);
+  document.getElementById('grid').innerHTML = list.map(j => `
+    <div class="ch" style="--c:${catOf(j.category).color}" onclick="openChar('${j.id}')">
+      <div class="emb"><span>${esc(plain(j.name).trim().charAt(0))}</span></div>
+      <div class="nm"><b>${esc(plain(j.name))}</b><i>${esc(plain(catOf(j.category).name || ''))}</i></div>
+    </div>`).join('');
+}
+function openChar(id) {
+  const j = G.jobs.find(x => x.id === id); if (!j) return;
+  const c = catOf(j.category);
+  const d = document.getElementById('detail');
+  d.style.setProperty('--c', c.color);
+  d.innerHTML = `<button class="x" onclick="shut()" aria-label="닫기">×</button>
+    <div class="dh"><div class="emb"><span>${esc(plain(j.name).trim().charAt(0))}</span></div><div><div class="en">${esc(j.id)}</div><h3>${mc(j.name)}</h3><div style="color:var(--mute);font-size:13px">${mc(c.name || '')} · 자원 ${esc(j.mana || '')}</div></div></div>
+    <div class="tagline">${(j.lore || []).map(mc).join('<br>')}</div>
+    <div class="card box"><h4>PASSIVE · 패시브</h4><p>${mc(j.passive || '')}</p></div>
+    <div class="card box"><h4>SKILLS · 스킬</h4>${(j.skills || []).map(s => `<div class="sk"><span class="key">${KEYS[s.slot] || '—'}</span><b>${mc(s.name)}</b><p>${mc(s.desc)}</p></div>`).join('')}</div>`;
+  d.classList.add('on'); d.setAttribute('aria-hidden', 'false'); d.scrollTop = 0;
+  document.getElementById('shade').classList.add('on');
+  history.replaceState(null, '', '#c-' + id);
+}
+function shut() { document.getElementById('detail').classList.remove('on'); document.getElementById('shade').classList.remove('on'); history.replaceState(null, '', '#codex'); }
+document.getElementById('shade').onclick = shut;
+addEventListener('keydown', e => { if (e.key === 'Escape') shut(); });
+</script>
 </body>
 </html>
