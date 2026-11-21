@@ -7,7 +7,7 @@
       "name": "차원 대균열",
       "description": "애니 캐릭터 꼬리잡기 · 차원 대균열",
       "address": "ekrznf.kro.kr:25565",
-      "version": "2026.11.20",
+      "version": "2026.11.21",
       "icon": "",
       "minecraftVersion": "1.21.11",
       "mainServer": true,
@@ -122,8 +122,8 @@
             "def": true
           },
           "artifact": {
-            "size": 33416318,
-            "MD5": "4f2b39933ee3a53a8b4839e852c300f4",
+            "size": 33416536,
+            "MD5": "a69077ae5ff863289a6f3100901389fa",
             "url": "https://github.com/ekrznf/ekrznf.github.io/releases/download/mods-latest/animetail-0.1.0.jar"
           }
         },
