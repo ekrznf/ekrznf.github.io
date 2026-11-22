@@ -37,7 +37,7 @@
               "type": "VersionManifest",
               "artifact": {
                 "size": 3428,
-                "MD5": "314e0a0831df06dc5d1497dc836c2a30",
+                "MD5": "0196a442c8a65e760d6bed04e0cc21ab",
                 "url": "files/versions/1.21.11-fabric-0.18.6/1.21.11-fabric-0.18.6.json"
               }
             },
@@ -122,8 +122,8 @@
             "def": true
           },
           "artifact": {
-            "size": 34695300,
-            "MD5": "15068c6b5db3fb6741b043af63155b72",
+            "size": 34697149,
+            "MD5": "d65389b4c2daeadd79b17676186589c8",
             "url": "https://github.com/ekrznf/ekrznf.github.io/releases/download/mods-latest/animetail-0.1.0.jar"
           }
         },

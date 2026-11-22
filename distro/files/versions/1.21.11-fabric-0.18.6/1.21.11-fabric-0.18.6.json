@@ -1,8 +1,8 @@
 {
   "id": "1.21.11-fabric-0.18.6",
   "inheritsFrom": "1.21.11",
-  "releaseTime": "2026-11-21T08:20:15+0000",
-  "time": "2026-11-21T08:20:15+0000",
+  "releaseTime": "2026-11-22T08:21:41+0000",
+  "time": "2026-11-22T08:21:41+0000",
   "type": "release",
   "mainClass": "net.fabricmc.loader.impl.launch.knot.KnotClient",
   "arguments": {
